@@ -41,12 +41,12 @@ ENV JAVA_HOME /usr/lib/jvm/jre-1.8.0-openjdk
 
 RUN yum install -y java-1.8.0-openjdk-headless unzip which
 
-RUN groupadd -g 1000 elasticsearch && \
-    adduser -u 1000 -g 1000 -d /usr/share/elasticsearch elasticsearch
+RUN groupadd -g 1001 elasticsearch && \
+    adduser -u 1001 -g 1001 -d /usr/share/elasticsearch elasticsearch
 
 WORKDIR /usr/share/elasticsearch
 
-USER 1000
+USER 1001
 
 # Download and extract defined ES version.
 RUN curl -fsSL {{ url_root }}/{{ tarball }} | \
@@ -70,7 +70,7 @@ RUN for PLUGIN in {{ ingest_plugins }}; do \
       elasticsearch-plugin install --batch "$PLUGIN"; done
 {%- endif %}
 
-COPY --chown=1000:0 elasticsearch.yml log4j2.properties config/
+COPY --chown=1001:0 elasticsearch.yml log4j2.properties config/
 
 USER 0
 
@@ -102,16 +102,16 @@ RUN yum update -y && \
     yum install -y nc unzip wget which && \
     yum clean all
 
-RUN groupadd -g 1000 elasticsearch && \
-    adduser -u 1000 -g 1000 -G 0 -d /usr/share/elasticsearch elasticsearch && \
+RUN groupadd -g 1001 elasticsearch && \
+    adduser -u 1001 -g 1001 -G 0 -d /usr/share/elasticsearch elasticsearch && \
     chmod 0775 /usr/share/elasticsearch && \
     chgrp 0 /usr/share/elasticsearch
 
 WORKDIR /usr/share/elasticsearch
-COPY --from=prep_es_files --chown=1000:0 /usr/share/elasticsearch /usr/share/elasticsearch
+COPY --from=prep_es_files --chown=1001:0 /usr/share/elasticsearch /usr/share/elasticsearch
 ENV PATH /usr/share/elasticsearch/bin:$PATH
 
-COPY --chown=1000:0 bin/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY --chown=1001:0 bin/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 # Openshift overrides USER and uses ones with randomly uid>1024 and gid=0
 # Allow ENTRYPOINT (and ES) to run even with a different user
